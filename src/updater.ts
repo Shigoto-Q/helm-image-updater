@@ -82,7 +82,6 @@ async function commitChange(
     parents: [commitSHA],
   });
   const currentSHA = tree.data.sha;
-  console.log(currentSHA);
 
   const commit = await octokit.git.createCommit({
     owner: owner,
