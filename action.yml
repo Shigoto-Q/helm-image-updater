@@ -1,0 +1,21 @@
+name: 'Helm image tag updater'
+description: 'Update Helm image on another repository'
+inputs:
+  access-token:
+    description: 'PAT, or any other token with enough permissions to commit to a repository.'
+    required: true
+  owner:
+    description: 'Owner/organization owning the repository.'
+    required: true
+  values-path:
+    description: 'Path of the desired values.yml file on the repository.'
+    required: true
+  current-tag:
+    description: 'Current image tag.'
+    required: true
+  new-tag:
+    description: 'New image tag'
+    required: true
+runs:
+  using: 'node16'
+  main: 'dist/helm-image-updater.js'
