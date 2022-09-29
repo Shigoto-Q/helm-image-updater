@@ -41,7 +41,7 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const octo = new rest_1.Octokit({
-                auth: core.getInput(constants_1.Inputs.AccessToken)
+                auth: core.getInput(constants_1.Inputs.AccessToken),
             });
             const owner = core.getInput(constants_1.Inputs.Owner);
             const repo = core.getInput(constants_1.Inputs.Repository);

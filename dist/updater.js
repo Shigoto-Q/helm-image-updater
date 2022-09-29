@@ -41,25 +41,27 @@ function commitChange(octokit, filepath, owner, repo, newContent) {
         const base64Encoded = js_base64_1.Base64.encode(newContent);
         const commits = yield octokit.repos.listCommits({
             owner: owner,
-            repo: repo
+            repo: repo,
         });
         const commitSHA = commits.data[0].sha;
         const file = {
             name: filepath,
-            contents: newContent
+            contents: newContent,
         };
-        const commitableFile = [{
+        const commitableFile = [
+            {
                 path: file.name,
-                mode: '100644',
-                type: 'commit',
+                mode: "100644",
+                type: "commit",
                 content: file.contents,
-            }];
+            },
+        ];
         const tree = yield octokit.git.createTree({
             owner: owner,
             repo: repo,
             tree: commitableFile,
             base_tree: commitSHA,
-            message: 'Updating image tag',
+            message: "Updating image tag",
             parents: [commitSHA],
         });
         const currentSHA = tree.data.sha;
