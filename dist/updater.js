@@ -11,30 +11,41 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateImage = void 0;
 const js_base64_1 = require("js-base64");
-function updateImage(octokit, filepath, owner, repo, currentTag, newTag) {
+const js_yaml_1 = require("js-yaml");
+const lodash_1 = require("lodash");
+function updateImage(octokit, filepath, owner, repo, imageKey, newTag) {
     return __awaiter(this, void 0, void 0, function* () {
         const currentContent = yield getFileContents(octokit, filepath, owner, repo);
-        const replacedString = getUpdatedFile(currentContent, currentTag, newTag);
-        commitChange(octokit, filepath, owner, repo, replacedString);
+        const replaced = getUpdatedFile(currentContent, imageKey, newTag);
+        commitChange(octokit, filepath, owner, repo, replaced);
     });
 }
 exports.updateImage = updateImage;
 function getFileContents(octokit, filepath, owner, repo) {
     return __awaiter(this, void 0, void 0, function* () {
-        const content = yield octokit.repos.getContent({
-            owner: owner,
-            path: filepath,
-            repo: repo,
-        });
-        const base64Decoded = js_base64_1.Base64.decode(content.data["content"]);
-        return base64Decoded;
+        try {
+            const content = yield octokit.repos.getContent({
+                owner: owner,
+                path: filepath,
+                repo: repo,
+            });
+            const base64Decoded = js_base64_1.Base64.decode(content.data["content"]);
+            return base64Decoded;
+        }
+        catch (err) {
+            throw new Error("Error while fetching values file! Check if the path provided is correct.");
+        }
     });
 }
-function getUpdatedFile(contents, currentTag, newTag) {
-    if (contents.indexOf(currentTag) < 0) {
-        throw new Error("Specified current tag not found in file.");
+function getUpdatedFile(contents, imageKey, newTag) {
+    const splitImageKey = imageKey.split('.');
+    const imageKeyOnly = splitImageKey[splitImageKey.length - 1];
+    if (contents.indexOf(imageKeyOnly) < 0) {
+        throw new Error("Provided image key not found in file content!");
     }
-    return contents.replace(currentTag, newTag);
+    const valuesFile = (0, js_yaml_1.load)(contents);
+    lodash_1._.set(valuesFile, imageKey, newTag);
+    return (0, js_yaml_1.dump)(valuesFile);
 }
 function commitChange(octokit, filepath, owner, repo, newContent) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -65,7 +76,6 @@ function commitChange(octokit, filepath, owner, repo, newContent) {
             parents: [commitSHA],
         });
         const currentSHA = tree.data.sha;
-        console.log(currentSHA);
         const commit = yield octokit.git.createCommit({
             owner: owner,
             repo: repo,

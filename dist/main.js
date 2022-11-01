@@ -46,7 +46,7 @@ function run() {
             const owner = core.getInput(constants_1.Inputs.Owner);
             const repo = core.getInput(constants_1.Inputs.Repository);
             const valuesPath = core.getInput(constants_1.Inputs.ValuesPath);
-            const currentTag = core.getInput(constants_1.Inputs.CurrentTag);
+            const imageKey = core.getInput(constants_1.Inputs.ImageKey);
             const newTag = core.getInput(constants_1.Inputs.NewTag);
             const repos = yield octo.repos.listForOrg({
                 org: owner,
@@ -54,7 +54,7 @@ function run() {
             if (!repos.data.map((repo) => repo.name).includes(repo)) {
                 throw new Error("Specified repository does not exist.");
             }
-            yield (0, updater_1.updateImage)(octo, valuesPath, owner, repo, currentTag, newTag);
+            yield (0, updater_1.updateImage)(octo, valuesPath, owner, repo, imageKey, newTag);
         }
         catch (err) {
             core.setFailed(err);

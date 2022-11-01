@@ -7,7 +7,7 @@ var Inputs;
     Inputs["Owner"] = "owner";
     Inputs["Repository"] = "repository";
     Inputs["ValuesPath"] = "values-path";
-    Inputs["CurrentTag"] = "current-tag";
+    Inputs["ImageKey"] = "image-key";
     Inputs["NewTag"] = "new-tag";
 })(Inputs = exports.Inputs || (exports.Inputs = {}));
 //# sourceMappingURL=constants.js.map

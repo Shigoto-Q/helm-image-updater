@@ -10,8 +10,8 @@ inputs:
   values-path:
     description: 'Path of the desired values.yml file on the repository.'
     required: true
-  current-tag:
-    description: 'Current image tag.'
+  image-key:
+    description: 'YAML key path containing the image tag, separated with dots. Example: image.repository.imageTag'
     required: true
   new-tag:
     description: 'New image tag'

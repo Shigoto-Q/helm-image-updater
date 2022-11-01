@@ -12,7 +12,7 @@ export async function run(): Promise<void> {
     const owner = core.getInput(Inputs.Owner);
     const repo = core.getInput(Inputs.Repository);
     const valuesPath = core.getInput(Inputs.ValuesPath);
-    const currentTag = core.getInput(Inputs.CurrentTag);
+    const imageKey = core.getInput(Inputs.ImageKey);
     const newTag = core.getInput(Inputs.NewTag);
 
     const repos = await octo.repos.listForOrg({
@@ -23,7 +23,7 @@ export async function run(): Promise<void> {
       throw new Error("Specified repository does not exist.");
     }
 
-    await updateImage(octo, valuesPath, owner, repo, currentTag, newTag);
+    await updateImage(octo, valuesPath, owner, repo, imageKey, newTag);
   } catch (err) {
     core.setFailed(err);
   }

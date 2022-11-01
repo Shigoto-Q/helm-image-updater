@@ -3,6 +3,6 @@ export enum Inputs {
   Owner = "owner",
   Repository = "repository",
   ValuesPath = "values-path",
-  CurrentTag = "current-tag",
+  ImageKey = "image-key",
   NewTag = "new-tag",
 }

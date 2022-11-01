@@ -1,18 +1,22 @@
 import { Octokit } from "@octokit/rest";
+import { readFileSync, writeFileSync } from "fs";
 import { Base64 } from "js-base64";
 import { File } from "./interfaces";
+import { load, dump } from "js-yaml";
+import { _ } from "lodash";
+
 
 export async function updateImage(
   octokit: Octokit,
   filepath: string,
   owner: string,
   repo: string,
-  currentTag: string,
+  imageKey: string,
   newTag: string
 ) {
   const currentContent = await getFileContents(octokit, filepath, owner, repo);
-  const replacedString = getUpdatedFile(currentContent, currentTag, newTag);
-  commitChange(octokit, filepath, owner, repo, replacedString);
+  const replaced = getUpdatedFile(currentContent, imageKey, newTag);
+  commitChange(octokit, filepath, owner, repo, replaced);
 }
 
 async function getFileContents(
@@ -21,28 +25,37 @@ async function getFileContents(
   owner: string,
   repo: string
 ): Promise<string> {
-  const content = await octokit.repos.getContent({
-    owner: owner,
-    path: filepath,
-    repo: repo,
-  });
+  try {
+    const content = await octokit.repos.getContent({
+      owner: owner,
+      path: filepath,
+      repo: repo,
+    });
+  
+    const base64Decoded = Base64.decode(content.data["content"]);
+  
+    return base64Decoded;
+  } catch (err) {
+    throw new Error("Error while fetching values file! Check if the path provided is correct.")
+  }
 
-  const base64Decoded = Base64.decode(content.data["content"]);
-
-  return base64Decoded;
 }
 
 function getUpdatedFile(
   contents: string,
-  currentTag: string,
+  imageKey: string,
   newTag: string
 ): string {
-  if (contents.indexOf(currentTag) < 0) {
-    throw new Error("Specified current tag not found in file.");
+  const splitImageKey = imageKey.split('.');
+  const imageKeyOnly = splitImageKey[splitImageKey.length-1]
+  if (contents.indexOf(imageKeyOnly) < 0) {
+    throw new Error("Provided image key not found in file content!");
   }
-
-  return contents.replace(currentTag, newTag);
+  const valuesFile = load(contents)
+  _.set(valuesFile, imageKey, newTag);
+  return dump(valuesFile)
 }
+
 
 async function commitChange(
   octokit: Octokit,
